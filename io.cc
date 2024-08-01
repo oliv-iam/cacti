@@ -192,8 +192,8 @@ InputParameter::parse_cfg(const string & in_file)
     	  //is_main_mem = false;
       }
 
-	  if (g_ip->print_detail_debug)
-	  {cout << "io.cc: is_3d_mem = " << is_3d_mem << endl;}
+      if (g_ip->print_detail_debug)
+      {cout << "io.cc: is_3d_mem = " << is_3d_mem << endl;}
 
       if (!strncmp("cam", temp_var, sizeof("cam"))) {
         pure_cam = true;
@@ -1006,7 +1006,18 @@ InputParameter::parse_cfg(const string & in_file)
 		  exit(1);
 	  }
      
-    }
+  }
+
+  if(!strncmp("-rtt_value", line, strlen("-rtt_value"))) {
+    sscanf(line, "-rtt_value %lf", &rtt_value);
+  }
+  if(!strncmp("-ron_value", line, strlen("-ron_value"))) {
+    sscanf(line, "-ron_value %lf", &ron_value);
+  }
+  if(!strncmp("-tflight_value", line, strlen("-tflight_value"))) {
+    sscanf(line, "-tflight_value %lf", &tflight_value);
+  }
+
     if(!strncmp("-total_power", line, strlen("-total_power"))) {
 	  sscanf(line, "-total_power%[^\"]\"%[^\"]\"", jk, temp_var);
       if (!strncmp("T", temp_var, strlen("T"))) 
@@ -1036,7 +1047,7 @@ InputParameter::parse_cfg(const string & in_file)
 	  }
 	  else
 	  {
-		  cout << "Invalid Input for same_bw_in_bob!" << endl;
+		  cout << "Invalid Input for verbose!" << endl;
 		  exit(1);
 	  }
      
@@ -1050,8 +1061,8 @@ InputParameter::parse_cfg(const string & in_file)
   fclose(fp);
 }
 
-  void
-InputParameter::display_ip()
+
+void InputParameter::display_ip() 
 {
   cout << "Cache size                    : " << cache_sz << endl;
   cout << "Block size                    : " << line_sz << endl;
@@ -1220,7 +1231,6 @@ powerDef operator*(const powerDef & x, double const * const y)
 
 uca_org_t cacti_interface(const string & infile_name)
 {
-
 	//cout<<"TSV_proj_type: " << g_ip->TSV_proj_type << endl;
   uca_org_t fin_res;
   //uca_org_t result;
@@ -1230,7 +1240,7 @@ uca_org_t cacti_interface(const string & infile_name)
   g_ip->parse_cfg(infile_name);
   if(!g_ip->error_checking())
 	  exit(0);
- // if (g_ip->print_input_args)
+  if (g_ip->print_input_args)
     g_ip->display_ip();
 	
 
@@ -1289,7 +1299,7 @@ uca_org_t cacti_interface(const string & infile_name)
 	
 	
    
-  IOTechParam iot(g_ip, g_ip->io_type, g_ip->num_mem_dq, g_ip->mem_data_width, g_ip->num_dq,g_ip->dram_dimm, 1,g_ip->bus_freq ); 
+  IOTechParam iot(g_ip, g_ip->io_type, g_ip->num_mem_dq, g_ip->mem_data_width, g_ip->num_dq, g_ip->dram_dimm, 1 ,g_ip->bus_freq ); 
   Extio testextio(&iot);  
   testextio.extio_area();
   testextio.extio_eye();
@@ -1336,12 +1346,20 @@ uca_org_t cacti_interface(const string & infile_name)
   solve(&fin_res);
 
   output_UCA(&fin_res);
-  output_data_csv(fin_res, infile_name + ".out");
-
+  
+  if(g_ip->is_3d_mem) {
+   output_data_csv_3dd(fin_res, infile_name + ".out");
+  } else {
+    output_data_csv(fin_res, infile_name + ".out");
+  } // added if statements
 
   // Memcad Optimization
+
+  if(g_ip->io_type==DDR3 || g_ip->io_type==DDR4) {
   MemCadParameters memcad_params(g_ip);
   solve_memcad(&memcad_params);
+  } // added if statement
+
 
 
   delete (g_ip);
@@ -1564,6 +1582,8 @@ uca_org_t cacti_interface(
 
   return fin_res;
 }
+
+
 
 //cacti6.5's plain interface, please keep !!!
 uca_org_t cacti_interface(
@@ -1946,7 +1966,7 @@ uca_org_t cacti_interface(
 bool InputParameter::error_checking()
 {
   int  A;
-  bool seq_access  = false;
+  bool seq_access = false;
   fast_access = true;
 
   switch (access_mode)
@@ -2194,14 +2214,14 @@ bool InputParameter::error_checking()
   return true;
 }
 
-void output_data_csv_3dd(const uca_org_t & fin_res)
+void output_data_csv_3dd(const uca_org_t & fin_res, string fn) // adjusted inputs and file naming
 {
   //TODO: the csv output should remain
-  fstream file("out.csv", ios::in);
+  fstream file(fn.c_str(), ios::in); 
   bool    print_index = file.fail();
   file.close();
 
-  file.open("out.csv", ios::out|ios::app);
+  file.open(fn.c_str(), ios::out|ios::app);
   if (file.fail() == true)
   {
     cerr << "File out.csv could not be opened successfully" << endl;
@@ -2253,14 +2273,14 @@ void output_data_csv_3dd(const uca_org_t & fin_res)
 //      file << "Ndcm, ";
 //      file << "Ndsam_level_1, ";
 //      file << "Ndsam_level_2, ";
-      file << "Data arrary area efficiency %, ";
+      file << "Data array area efficiency %, ";
 //      file << "Ntwl, ";
 //      file << "Ntbl, ";
 //      file << "Ntspd, ";
 //      file << "Ntcm, ";
 //      file << "Ntsam_level_1, ";
 //      file << "Ntsam_level_2, ";
-//      file << "Tag arrary area efficiency %, ";
+//      file << "Tag array area efficiency %, ";
 
 //      file << "Resistance per unit micron (ohm-micron), ";
 //      file << "Capacitance per unit micron (fF per micron), ";
@@ -2578,14 +2598,14 @@ void output_data_csv(const uca_org_t & fin_res, string fn)
       file << "Ndcm, ";
       file << "Ndsam_level_1, ";
       file << "Ndsam_level_2, ";
-      file << "Data arrary area efficiency %, ";
+      file << "Data array area efficiency %, ";
       file << "Ntwl, ";
       file << "Ntbl, ";
       file << "Ntspd, ";
       file << "Ntcm, ";
       file << "Ntsam_level_1, ";
       file << "Ntsam_level_2, ";
-      file << "Tag arrary area efficiency %, ";
+      file << "Tag array area efficiency %, ";
 
 //      file << "Resistance per unit micron (ohm-micron), ";
 //      file << "Capacitance per unit micron (fF per micron), ";
@@ -2733,10 +2753,10 @@ void output_UCA(uca_org_t *fr)
 	if(g_ip->is_3d_mem)
 	{
 
-		cout<<"-------  CACTI (version "<< VER_MAJOR_CACTI <<"."<< VER_MINOR_CACTI<<"."VER_COMMENT_CACTI
-								<< " of " << VER_UPDATE_CACTI << ") 3D DRAM Main Memory  -------"<<endl;
+		cout<<"\n-------  CACTI (version "<< VER_MAJOR_CACTI <<"."<< VER_MINOR_CACTI<<"."<< VER_COMMENT_CACTI
+								<< " of " << VER_UPDATE_CACTI << ") 3D DRAM Main Memory  -------\n"<<endl;
 
-		cout << "\nMemory Parameters:\n";
+		cout << "Memory Parameters:\n";
 		cout << "	Total memory size (Gb): " <<
 				(int) (g_ip->cache_sz) << endl;
 		if(g_ip->num_die_3d>1)
@@ -2810,17 +2830,17 @@ void output_UCA(uca_org_t *fr)
   }
   else {
     if (g_ip->data_arr_ram_cell_tech_type == 3) {
-      cout << "\n---------- CACTI (version "<< VER_MAJOR_CACTI <<"."<< VER_MINOR_CACTI<<"."VER_COMMENT_CACTI
+      cout << "\n---------- CACTI (version "<< VER_MAJOR_CACTI <<"."<< VER_MINOR_CACTI<<"."<< VER_COMMENT_CACTI
 								<< " of " << VER_UPDATE_CACTI << "), Uniform Cache Access " <<
         "Logic Process Based DRAM Model ----------\n";
     }
     else if (g_ip->data_arr_ram_cell_tech_type == 4) {
-      cout << "\n---------- CACTI (version "<< VER_MAJOR_CACTI <<"."<< VER_MINOR_CACTI<<"."VER_COMMENT_CACTI
-								<< " of " << VER_UPDATE_CACTI << "), Uniform" <<
+      cout << "\n---------- CACTI (version "<< VER_MAJOR_CACTI <<"."<< VER_MINOR_CACTI<<"."<< VER_COMMENT_CACTI
+								<< " of " << VER_UPDATE_CACTI << "), Uniform " <<
         "Cache Access Commodity DRAM Model ----------\n";
     }
     else {
-      cout << "\n---------- CACTI (version "<< VER_MAJOR_CACTI <<"."<< VER_MINOR_CACTI<<"."VER_COMMENT_CACTI
+      cout << "\n---------- CACTI (version "<< VER_MAJOR_CACTI <<"."<< VER_MINOR_CACTI<<"."<< VER_COMMENT_CACTI
 								<< " of " << VER_UPDATE_CACTI << "), Uniform Cache Access "
         "SRAM Model ----------\n";
     }

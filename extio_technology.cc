@@ -331,6 +331,14 @@ IOTechParam::IOTechParam(InputParameter * g_ip)
     t_flight = 0.5;
     t_flight_ca = 0.5;
 
+    // from input params <- my modification
+    rtt1_dq_read = g_ip->rtt_value;
+    rtt2_dq_read = g_ip->rtt_value;
+    rtt1_dq_write = g_ip->rtt_value;
+    rtt2_dq_write = g_ip->rtt_value;
+    r_on = g_ip->ron_value;
+    t_flight = g_ip->tflight_value;
+
     // Voltage noise coeffecients
     k_noise_write = 0.2; 
     k_noise_read = 0.2; 
@@ -460,6 +468,14 @@ IOTechParam::IOTechParam(InputParameter * g_ip)
      t_flight = 0.05;
      t_flight_ca = 0.05;
 
+    // from input params <- my modification
+    rtt1_dq_read = g_ip->rtt_value;
+    rtt2_dq_read = g_ip->rtt_value;
+    rtt1_dq_write = g_ip->rtt_value;
+    rtt2_dq_write = g_ip->rtt_value;
+    r_on = g_ip->ron_value;
+    t_flight = g_ip->tflight_value;
+
      // Voltage noise coeffecients
      k_noise_write = 0.2; 
      k_noise_read = 0.2; 
@@ -575,19 +591,27 @@ IOTechParam::IOTechParam(InputParameter * g_ip)
      //External IO Configuration Parameters 
 
      r_diff_term = 100;
-     rtt1_dq_read = g_ip->rtt_value; 
-     rtt2_dq_read = g_ip->rtt_value; 
-     rtt1_dq_write = g_ip->rtt_value;
-     rtt2_dq_write = g_ip->rtt_value; 
+     rtt1_dq_read = 60;
+     rtt2_dq_read = 60;
+     rtt1_dq_write = 60;
+     rtt2_dq_write = 60; 
      rtt_ca = 50; 
      rs1_dq = 15; 
      rs2_dq = 15; 
      r_stub_ca = 0; 
-     r_on = g_ip->ron_value; 
+     r_on = 34;
      r_on_ca = 50; 
      z0 = 50;
-     t_flight = g_ip->tflight_value;
+     t_flight = 1.0;
      t_flight_ca = 2;
+
+    // from input params <- my modification
+     rtt1_dq_read = g_ip->rtt_value;
+     rtt2_dq_read = g_ip->rtt_value;
+     rtt1_dq_write = g_ip->rtt_value;
+     rtt2_dq_write = g_ip->rtt_value;
+     r_on = g_ip->ron_value;
+     t_flight = g_ip->tflight_value;
 
      // Voltage noise coeffecients
 
@@ -981,6 +1005,14 @@ IOTechParam::IOTechParam(InputParameter * g_ip, Mem_IO_type io_type1, int num_me
     t_flight = 0.5;
     t_flight_ca = 0.5;
 
+    // from input params <- my modification
+     rtt1_dq_read = g_ip->rtt_value;
+     rtt2_dq_read = g_ip->rtt_value;
+     rtt1_dq_write = g_ip->rtt_value;
+     rtt2_dq_write = g_ip->rtt_value;
+     r_on = g_ip->ron_value;
+     t_flight = g_ip->tflight_value;
+
     // Voltage noise coeffecients
     k_noise_write = 0.2; 
     k_noise_read = 0.2; 
@@ -1110,6 +1142,14 @@ IOTechParam::IOTechParam(InputParameter * g_ip, Mem_IO_type io_type1, int num_me
      t_flight = 0.05;
      t_flight_ca = 0.05;
 
+    // from input params <- my modification
+     rtt1_dq_read = g_ip->rtt_value;
+     rtt2_dq_read = g_ip->rtt_value;
+     rtt1_dq_write = g_ip->rtt_value;
+     rtt2_dq_write = g_ip->rtt_value;
+     r_on = g_ip->ron_value;
+     t_flight = g_ip->tflight_value;
+
      // Voltage noise coeffecients
      k_noise_write = 0.2; 
      k_noise_read = 0.2; 
@@ -1226,12 +1266,14 @@ IOTechParam::IOTechParam(InputParameter * g_ip, Mem_IO_type io_type1, int num_me
 
      r_diff_term = 100;
      
-     /*
-     rtt1_dq_read = g_ip->rtt_value; 
-     rtt2_dq_read = g_ip->rtt_value; 
-     rtt1_dq_write = g_ip->rtt_value;
-     rtt2_dq_write = g_ip->rtt_value;
-     */
+     // uncommented these, changed to default values
+     rtt1_dq_read = 60; 
+     rtt2_dq_read = 60; 
+     rtt1_dq_write = 60;
+     rtt2_dq_write = 60;
+     
+
+    /*
      switch(connection)
      {
 		 case(0):
@@ -1254,18 +1296,25 @@ IOTechParam::IOTechParam(InputParameter * g_ip, Mem_IO_type io_type1, int num_me
 			break;
 		default:
 			break;
-	 }
+	 } */
      
-      
      rtt_ca = 50; 
      rs1_dq = 15; 
      rs2_dq = 15; 
      r_stub_ca = 0; 
-     r_on = g_ip->ron_value; 
+     r_on = 34; 
      r_on_ca = 50; 
      z0 = 50;
-     t_flight = g_ip->tflight_value;
+     t_flight = 1.0;
      t_flight_ca = 2;
+
+     // inputs
+     t_flight = g_ip->tflight_value;
+     r_on = g_ip->ron_value; 
+     rtt1_dq_read = g_ip->rtt_value; 
+     rtt2_dq_read = g_ip->rtt_value; 
+     rtt1_dq_write = g_ip->rtt_value;
+     rtt2_dq_write = g_ip->rtt_value;
 
      // Voltage noise coeffecients
 
@@ -1391,12 +1440,14 @@ IOTechParam::IOTechParam(InputParameter * g_ip, Mem_IO_type io_type1, int num_me
      //External IO Configuration Parameters 
 
      r_diff_term = 100;
-     /*
-     rtt1_dq_read = g_ip->rtt_value; 
+     // uncommented below
+     rtt1_dq_read = g_ip->rtt_value;
      rtt2_dq_read = g_ip->rtt_value; 
      rtt1_dq_write = g_ip->rtt_value;
      rtt2_dq_write = g_ip->rtt_value; 
-     */
+     
+
+    /* commented this out
      
      switch(connection)
      {
@@ -1421,6 +1472,8 @@ IOTechParam::IOTechParam(InputParameter * g_ip, Mem_IO_type io_type1, int num_me
 		default:
 			break;
 	 }
+
+     */
      
      rtt_ca = 50; 
      rs1_dq = 15; 
@@ -1430,7 +1483,7 @@ IOTechParam::IOTechParam(InputParameter * g_ip, Mem_IO_type io_type1, int num_me
      r_on_ca = 50; 
      z0 = 50;
      t_flight = g_ip->tflight_value;
-     t_flight_ca = 2;
+     t_flight_ca = 2.0;
 
      // Voltage noise coeffecients
 

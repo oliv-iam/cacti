@@ -866,23 +866,25 @@ void TechnologyParameter::assign_tsv(const string & in_file)
 			  tsv_liner_dielectric_constant = scan_input_double_tsv_type(line,"-tsv_liner_dielectric_cons","F/um", g_ip->ic_proj_type, tsv_type, g_ip->print_detail_debug);
 			  continue;
 			}
-			
-			tsv_length *= g_ip->num_die_3d;
-			if(iter==0)
-			{
-				tsv_parasitic_resistance_fine = tsv_resistance(BULK_CU_RESISTIVITY, tsv_length, tsv_diameter, tsv_contact_resistance);
-				tsv_parasitic_capacitance_fine = tsv_capacitance(tsv_length, tsv_diameter, tsv_pitch, tsv_dielec_thickness, tsv_liner_dielectric_constant, tsv_depletion_width);
-				tsv_minimum_area_fine = tsv_area(tsv_pitch);
-			}
-			else
-			{
-				tsv_parasitic_resistance_coarse = tsv_resistance(BULK_CU_RESISTIVITY, tsv_length, tsv_diameter, tsv_contact_resistance);
-				tsv_parasitic_capacitance_coarse = tsv_capacitance(tsv_length, tsv_diameter, tsv_pitch, tsv_dielec_thickness, tsv_liner_dielectric_constant, tsv_depletion_width);
-				tsv_minimum_area_coarse = tsv_area(tsv_pitch);
-			}
+	
+		}
+
+		fclose(fp);
+
+		tsv_length *= g_ip->num_die_3d;
+		if(iter==0)
+		{
+			tsv_parasitic_resistance_fine = tsv_resistance(BULK_CU_RESISTIVITY, tsv_length, tsv_diameter, tsv_contact_resistance);
+			tsv_parasitic_capacitance_fine = tsv_capacitance(tsv_length, tsv_diameter, tsv_pitch, tsv_dielec_thickness, tsv_liner_dielectric_constant, tsv_depletion_width);
+			tsv_minimum_area_fine = tsv_area(tsv_pitch);
+		}
+		else
+		{
+			tsv_parasitic_resistance_coarse = tsv_resistance(BULK_CU_RESISTIVITY, tsv_length, tsv_diameter, tsv_contact_resistance);
+			tsv_parasitic_capacitance_coarse = tsv_capacitance(tsv_length, tsv_diameter, tsv_pitch, tsv_dielec_thickness, tsv_liner_dielectric_constant, tsv_depletion_width);
+			tsv_minimum_area_coarse = tsv_area(tsv_pitch);
 		}
 		
-		fclose(fp);
 	}
 }
 
@@ -1621,15 +1623,15 @@ DynamicParameter::init_CAM()
 
   // calculate wire parameters
 
-  double c_b_metal = cell.h * wire_local.C_per_um;
+  //double c_b_metal = cell.h * wire_local.C_per_um;
 //  double C_bl;
 
-  c_b_metal = cam_cell.h * wire_local.C_per_um;//IBM and SUN design, SRAM array uses dummy cells to fill the blank space due to mismatch on CAM-RAM
+  //c_b_metal = cam_cell.h * wire_local.C_per_um;//IBM and SUN design, SRAM array uses dummy cells to fill the blank space due to mismatch on CAM-RAM
   V_b_sense = (0.05 * g_tp.sram_cell.Vdd > VBITSENSEMIN) ? 0.05 * g_tp.sram_cell.Vdd : VBITSENSEMIN;
   deg_bl_muxing = 1;//FA fix as 1
   // "/ 2.0" below is due to the fact that two adjacent access transistors share drain
   // contacts in a physical layout
-  double Cbitrow_drain_cap = drain_C_(g_tp.cam.cell_a_w, NCH, 1, 0, cam_cell.w, false, true) / 2.0;//TODO: comment out these two lines
+ // double Cbitrow_drain_cap = drain_C_(g_tp.cam.cell_a_w, NCH, 1, 0, cam_cell.w, false, true) / 2.0;//TODO: comment out these two lines
 //  C_bl = num_r_subarray * (Cbitrow_drain_cap + c_b_metal);
   dram_refresh_period = 0;
 
@@ -1782,15 +1784,15 @@ DynamicParameter::init_FA()
   cell.w = g_tp.sram.b_w + 2 * wire_local.pitch * (g_ip->num_rw_ports -1 + (g_ip->num_rd_ports - g_ip->num_se_rd_ports)
       + g_ip->num_wr_ports) + g_tp.wire_local.pitch * g_ip->num_se_rd_ports + 2 * wire_local.pitch*(g_ip->num_search_ports-1);
 
-  double c_b_metal = cell.h * wire_local.C_per_um;
+  // double c_b_metal = cell.h * wire_local.C_per_um;
   //  double C_bl;
 
-  c_b_metal = cam_cell.h * wire_local.C_per_um;//IBM and SUN design, SRAM array uses dummy cells to fill the blank space due to mismatch on CAM-RAM
+  // c_b_metal = cam_cell.h * wire_local.C_per_um;//IBM and SUN design, SRAM array uses dummy cells to fill the blank space due to mismatch on CAM-RAM
   V_b_sense = (0.05 * g_tp.sram_cell.Vdd > VBITSENSEMIN) ? 0.05 * g_tp.sram_cell.Vdd : VBITSENSEMIN;
   deg_bl_muxing = 1;//FA fix as 1
   // "/ 2.0" below is due to the fact that two adjacent access transistors share drain
   // contacts in a physical layout
-  double Cbitrow_drain_cap = drain_C_(g_tp.cam.cell_a_w, NCH, 1, 0, cam_cell.w, false, true) / 2.0;//TODO: comment out these two lines
+  // double Cbitrow_drain_cap = drain_C_(g_tp.cam.cell_a_w, NCH, 1, 0, cam_cell.w, false, true) / 2.0;//TODO: comment out these two lines
   //	  C_bl = num_r_subarray * (Cbitrow_drain_cap + c_b_metal);
   dram_refresh_period = 0;
 
